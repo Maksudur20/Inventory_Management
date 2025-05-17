@@ -1,0 +1,133 @@
+@model DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "User";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h1 class="card-title">Welcome, @role</h1>
+                    <p class="card-text">Manage your inventory efficiently with our system.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total Items</h5>
+                    <p class="display-4">@Model.TotalItems</p>
+                    <a asp-controller="Inventory" asp-action="Index" class="text-white">View all items <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white @(Model.LowStockCount > 0 ? "bg-danger" : "bg-success")">
+                <div class="card-body">
+                    <h5 class="card-title">Low Stock Items</h5>
+                    <p class="display-4">@Model.LowStockCount</p>
+                    <a asp-controller="Inventory" asp-action="LowStock" class="text-white">View low stock <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Stock Movements</h5>
+                    <p class="display-4">@Model.TotalMovements</p>
+                    <a asp-controller="StockMovement" asp-action="Index" class="text-white">View movements <i class="bi bi-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity and Alerts -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Recent Stock Movements</h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.RecentMovements.Any())
+                    {
+                        <p class="text-muted">No recent stock movements found.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var movement in Model.RecentMovements)
+                            {
+                                <div class="list-group-item border-0 pb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-1">@(movement.Item?.Name ?? "[Item Deleted]")</h6>
+                                        <small>@movement.MovementDate.ToString("MMM dd, HH:mm")</small>
+                                    </div>
+                                    <p class="mb-1">
+                                        @movement.Type: @movement.Quantity units
+                                    </p>
+                                    <small>By: @(movement.User?.UserName ?? "System")</small>
+                                </div>
+                            }
+                        </div>
+                        <div class="text-center mt-3">
+                            <a asp-controller="StockMovement" asp-action="Index" class="btn btn-outline-primary btn-sm">View All Movements</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Unread Alerts</h5>
+                    @if (Model.UnreadAlerts.Any())
+                    {
+                        <span class="badge bg-danger rounded-pill">@Model.UnreadAlerts.Count</span>
+                    }
+                </div>
+                <div class="card-body">
+                    @if (!Model.UnreadAlerts.Any())
+                    {
+                        <p class="text-muted">No unread alerts at this time.</p>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var alert in Model.UnreadAlerts)
+                            {
+                                <div class="list-group-item border-left border-5">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-1">@alert.Message</h6>
+                                        <small>@alert.CreatedAt.ToString("MMM dd, HH:mm")</small>
+                                    </div>
+                                    @if (alert.Item != null)
+                                    {
+                                        <small class="text-muted">Item: @alert.Item.Name</small>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <div class="text-center mt-3">
+                            <a asp-controller="Alert" asp-action="Index" class="btn btn-outline-primary btn-sm">View All Alerts</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

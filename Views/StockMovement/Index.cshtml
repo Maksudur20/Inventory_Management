@@ -1,0 +1,85 @@
+@model IEnumerable<InventorySystem.Models.StockMovement>
+
+@{
+    ViewData["Title"] = "Stock Movements";
+}
+
+<h1>Stock Movements</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        @if (User.IsInRole("Administrator"))
+        {
+            <a asp-action="Create" class="btn btn-primary">Record Stock Movement</a>
+        }
+        else
+        {
+            <button type="button" class="btn btn-primary" disabled data-bs-toggle="tooltip" 
+                    title="Only administrators can modify stock movements">
+                Record Stock Movement
+            </button>
+            <span class="text-danger ms-2">Only administrators can modify inventory</span>
+        }
+    </div>
+</div>
+
+@if (!User.IsInRole("Administrator"))
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        You are in view-only mode. Contact an administrator if you need to make changes to inventory.
+    </div>
+}
+
+<table class="table table-striped table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Item</th>
+            <th>Type</th>
+            <th>Quantity</th>
+            <th>Date</th>
+            <th>User</th>
+            <th>Notes</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var movement in Model)
+            {
+                <tr>
+                    <td>@(movement.Item?.Name ?? "[Item Deleted]")</td>
+                    <td><span class="badge @(movement.Type == MovementType.In ? "bg-success" : movement.Type == MovementType.Out ? "bg-danger" : "bg-warning")">@movement.Type</span></td>
+                    <td>@movement.Quantity</td>
+                    <td>@movement.MovementDate.ToString("g")</td>
+                    <td>@(movement.User?.UserName ?? "System")</td>
+                    <td>@(string.IsNullOrEmpty(movement.Notes) ? "-" : movement.Notes)</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@movement.Id" class="btn btn-sm btn-info">Details</a>
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@movement.Id" class="btn btn-sm btn-warning">Edit</a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="7" class="text-center">
+                    No stock movements found. 
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <a asp-action="Create">Create one now</a>
+                    }
+                    else
+                    {
+                        <span>Only administrators can create stock movements.</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

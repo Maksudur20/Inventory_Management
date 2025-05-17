@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-shield-lock"></i> Access Denied</h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 4rem;"></i>
+                    </div>
+                    <h5 class="card-title text-center">Permission Restricted</h5>
+                    <p class="card-text text-center">
+                        You don't have sufficient permissions to access this resource.
+                        This area is restricted based on your current role.
+                    </p>
+                    <div class="alert alert-info">
+                        <small>
+                            <i class="bi bi-info-circle"></i> If you believe you should have access to this page,
+                            please contact the system administrator.
+                        </small>
+                    </div>
+                </div>
+                <div class="card-footer text-center">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-house"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
